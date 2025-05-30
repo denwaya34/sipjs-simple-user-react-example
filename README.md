@@ -1,10 +1,16 @@
 # SIP.jsを用いたSIPクライアントの実装
 
 ## ソースコード
-- [Githubリポジトリ: sipjs-simple-user-react-example](https://denwaya34.github.io/sipjs-simple-user-react-example/)
+- [Githubリポジトリ: denwaya34/sipjs-simple-user-react-example](https://github.com/denwaya34/sipjs-simple-user-react-example)
 
 ## Demo
 - [Github Pages](https://denwaya34.github.io/sipjs-simple-user-react-example/)
+
+## 
+
+```shell
+npx degit 
+```
 
 ## 作成プロンプト
 
