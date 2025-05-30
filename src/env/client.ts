@@ -3,16 +3,11 @@ import { z } from 'zod';
 
 export const env = createEnv({
   clientPrefix: 'VITE_',
-
   client: {
-    VITE_SIP_URL: z.string().min(1),
+    VITE_SIP_URL: z.string().optional(),
+    VITE_SIP_USER_NAME: z.string().optional(),
+    VITE_SIP_USER_PASSWORD: z.string().optional(),
   },
-
-  /**
-   * What object holds the environment variables at runtime. This is usually
-   * `process.env` or `import.meta.env`.
-   */
-  runtimeEnv: process.env,
-
+  runtimeEnv: import.meta.env,
   emptyStringAsUndefined: true,
 });
