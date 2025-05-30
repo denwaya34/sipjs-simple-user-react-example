@@ -9,7 +9,7 @@
 ## 
 
 ```shell
-npx degit 
+npx degit denwaya34/sipjs-simple-user-react-example my-sipjs-example
 ```
 
 ## 作成プロンプト
