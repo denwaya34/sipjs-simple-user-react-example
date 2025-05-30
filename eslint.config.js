@@ -5,6 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 import reactX from 'eslint-plugin-react-x'
 import reactDom from 'eslint-plugin-react-dom'
+import perfectionist from 'eslint-plugin-perfectionist'
 
 export default tseslint.config(
   {
@@ -33,6 +34,7 @@ export default tseslint.config(
       'react-refresh': reactRefresh,
       'react-x': reactX,
       'react-dom': reactDom,
+      perfectionist,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -42,6 +44,7 @@ export default tseslint.config(
       ],
       ...reactX.configs['recommended-typescript'].rules,
       ...reactDom.configs.recommended.rules,
+      'perfectionist/sort-imports': 'error',
     },
   },
 )
