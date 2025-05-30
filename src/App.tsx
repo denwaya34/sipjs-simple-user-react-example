@@ -91,7 +91,7 @@ function App() {
   return (
     <div className="min-h-screen bg-base-200 p-4">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">SIP Phone</h1>
+        <h1 className="text-3xl font-bold text-center mb-8 text-primary">SIP Phone</h1>
 
         {/* エラー表示 */}
         {error && (
@@ -101,18 +101,18 @@ function App() {
         )}
 
         {/* 接続設定フォーム */}
-        <div className="card bg-base-100 shadow-xl mb-6">
+        <div className="card bg-white shadow-xl mb-6 border border-gray-200">
           <div className="card-body">
-            <h2 className="card-title">接続設定</h2>
+            <h2 className="card-title text-primary">接続設定</h2>
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">SIP WebSocket URL</span>
+                <span className="label-text text-gray-700 font-medium">SIP WebSocket URL</span>
               </label>
               <input
                 type="text"
                 placeholder="wss://sip.example.com"
-                className="input input-bordered"
+                className="input input-bordered bg-white"
                 value={sipUrl}
                 onChange={(e) => { setSipUrl(e.target.value); }}
                 disabled={connectionState !== 'disconnected'}
@@ -121,12 +121,12 @@ function App() {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">SIP User</span>
+                <span className="label-text text-gray-700 font-medium">SIP User</span>
               </label>
               <input
                 type="text"
                 placeholder="username"
-                className="input input-bordered"
+                className="input input-bordered bg-white"
                 value={sipUser}
                 onChange={(e) => { setSipUser(e.target.value); }}
                 disabled={connectionState !== 'disconnected'}
@@ -135,12 +135,12 @@ function App() {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">SIP Password</span>
+                <span className="label-text text-gray-700 font-medium">SIP Password</span>
               </label>
               <input
                 type="password"
                 placeholder="password"
-                className="input input-bordered"
+                className="input input-bordered bg-white"
                 value={sipPassword}
                 onChange={(e) => { setSipPassword(e.target.value); }}
                 disabled={connectionState !== 'disconnected'}
@@ -174,25 +174,25 @@ function App() {
         </div>
 
         {/* 通話コントロール */}
-        <div className="card bg-base-100 shadow-xl">
+        <div className="card bg-white shadow-xl border border-gray-200">
           <div className="card-body">
-            <h2 className="card-title">通話コントロール</h2>
+            <h2 className="card-title text-primary">通話コントロール</h2>
 
             {/* 状態表示 */}
-            <div className="stat bg-base-200 rounded-box mb-4">
-              <div className="stat-title">現在の状態</div>
-              <div className="stat-value text-lg">{getStatusDisplay()}</div>
+            <div className="stat bg-gray-50 rounded-box mb-4 border border-gray-200">
+              <div className="stat-title text-gray-600">現在の状態</div>
+              <div className="stat-value text-lg text-gray-800">{getStatusDisplay()}</div>
             </div>
 
             {/* 発信フォーム */}
             <div className="form-control mb-4">
               <label className="label">
-                <span className="label-text">発信番号</span>
+                <span className="label-text text-gray-700 font-medium">発信番号</span>
               </label>
               <input
                 type="text"
                 placeholder="1234 または sip:user@example.com"
-                className="input input-bordered"
+                className="input input-bordered bg-white"
                 value={phoneNumber}
                 onChange={(e) => { setPhoneNumber(e.target.value); }}
                 disabled={connectionState !== 'connected'}
