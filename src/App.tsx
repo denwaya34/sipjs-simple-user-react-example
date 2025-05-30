@@ -34,10 +34,9 @@ function App() {
 
   // 接続ボタンのクリックハンドラ
   const handleConnect = () => {
-    const aor = `sip:${sipUser}`;
     void connect({
       server: sipUrl,
-      aor,
+      user: sipUser,
       password: sipPassword,
     });
   };
