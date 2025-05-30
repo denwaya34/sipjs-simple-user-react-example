@@ -1,6 +1,8 @@
 import { Phone, PhoneOff, PhoneIncoming } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
+import { env } from '@/env/client';
+
 import { useSipPhone } from './hooks/useSipPhone';
 
 function App() {
@@ -17,10 +19,10 @@ function App() {
   } = useSipPhone();
 
   // フォームの状態
-  const [sipUrl, setSipUrl] = useState('');
-  const [sipUser, setSipUser] = useState('');
-  const [sipPassword, setSipPassword] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [sipUrl, setSipUrl] = useState(env.VITE_SIP_URL ?? '');
+  const [sipUser, setSipUser] = useState(env.VITE_SIP_USER_NAME ?? '');
+  const [sipPassword, setSipPassword] = useState(env.VITE_SIP_USER_PASSWORD ?? '');
+  const [phoneNumber, setPhoneNumber] = useState(env.VITE_CALL_TO_URL ?? '');
 
   // オーディオ要素の参照
   const audioRef = useRef<HTMLAudioElement>(null);
