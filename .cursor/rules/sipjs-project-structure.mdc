@@ -1,6 +1,6 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
 # SIP.js React プロジェクト構造ガイド
@@ -12,21 +12,27 @@ alwaysApply: false
 ```
 sipjs-simple-user-react-example/
 ├── src/
-│   ├── main/                    # メインアプリケーションコード
-│   │   ├── components/          # Reactコンポーネント
-│   │   ├── hooks/              # カスタムReactフック
-│   │   ├── lib/                # ユーティリティとヘルパー関数
-│   │   ├── App.tsx             # メインアプリケーションコンポーネント
-│   │   ├── main.tsx            # アプリケーションエントリーポイント
-│   │   └── index.css           # グローバルスタイル
-│   ├── types/                  # TypeScript型定義
-│   └── index.html              # HTMLテンプレート
-├── public/                     # 静的アセット
-├── .cursor/rules/              # Cursor AIルール
-├── package.json               # プロジェクト設定と依存関係
-├── vite.config.ts             # Vite設定
-├── tsconfig.json              # TypeScript設定
-└── eslint.config.js           # ESLint設定
+│   ├── components/             # Reactコンポーネント
+│   │   └── ui/                # shadcn/ui コンポーネント
+│   ├── lib/                   # ユーティリティとヘルパー関数
+│   ├── types/                 # TypeScript型定義
+│   ├── App.tsx               # メインアプリケーションコンポーネント
+│   ├── main.tsx              # アプリケーションエントリーポイント
+│   └── index.css             # グローバルスタイル（Tailwind CSS含む）
+├── public/                    # 静的アセット
+├── .cursor/rules/             # Cursor AIルール
+├── .github/workflows/         # GitHub Actions
+├── .run/                      # IDE実行設定
+├── components.json            # shadcn/ui設定
+├── package.json              # プロジェクト設定と依存関係
+├── vite.config.ts            # Vite設定
+├── tsconfig.json             # TypeScript設定
+├── tsconfig.app.json         # アプリケーション用TypeScript設定
+├── tsconfig.node.json        # Node.js用TypeScript設定
+├── eslint.config.js          # ESLint設定
+├── pnpm-workspace.yaml       # pnpmワークスペース設定
+├── mise.toml                 # 開発環境設定
+└── index.html                # HTMLテンプレート
 ```
 
 ## 主要技術スタック
@@ -37,6 +43,8 @@ sipjs-simple-user-react-example/
 - **Vite 6.3.5**: 高速ビルドツール
 - **Tailwind CSS 4.1.8**: ユーティリティファーストCSS
 - **daisyUI 5.0.43**: Tailwind CSSコンポーネントライブラリ
+- **shadcn/ui**: モダンUIコンポーネントライブラリ
+- **Lucide React**: アイコンライブラリ
 
 ## ファイル命名規則
 
@@ -47,20 +55,21 @@ sipjs-simple-user-react-example/
 
 ## コンポーネント配置ルール
 
-### `/src/main/components/`
+### `/src/components/`
 - 再利用可能なUIコンポーネント
 - SIP関連のコンポーネント（通話UI、連絡先リストなど）
 - フォームコンポーネント
 
-### `/src/main/hooks/`
-- SIP.js関連のカスタムフック
-- 状態管理フック
-- API呼び出しフック
+### `/src/components/ui/`
+- shadcn/uiコンポーネント
+- 基本的なUIプリミティブ
+- 現在含まれるコンポーネント: [button.tsx](mdc:src/components/ui/button.tsx)
 
-### `/src/main/lib/`
+### `/src/lib/`
 - SIP.js設定とユーティリティ
 - 共通ヘルパー関数
 - 定数定義
+- shadcn/ui utilities
 
 ### `/src/types/`
 - SIP関連の型定義
@@ -69,7 +78,7 @@ sipjs-simple-user-react-example/
 
 ## SIP.js 統合ガイドライン
 
-1. **SIP設定**: `/src/main/lib/sipConfig.ts` でSIP設定を管理
+1. **SIP設定**: `/src/lib/sipConfig.ts` でSIP設定を管理
 2. **通話管理**: カスタムフックで通話状態を管理
 3. **エラーハンドリング**: SIP関連エラーの適切な処理
 4. **型安全性**: SIP.jsイベントとメソッドの型定義
@@ -81,10 +90,31 @@ sipjs-simple-user-react-example/
 3. **リント**: `pnpm lint`
 4. **プレビュー**: `pnpm preview`
 
+## パッケージマネージャー
+
+- **pnpm**: 高速で効率的なパッケージマネージャー
+- **preinstall**: npm/yarnの使用を防ぐ設定済み
+- **ワークスペース**: [pnpm-workspace.yaml](mdc:pnpm-workspace.yaml)で設定
+
 ## 重要な設定ファイル
 
 - [vite.config.ts](mdc:vite.config.ts): Vite設定、プラグイン、ビルド設定
 - [package.json](mdc:package.json): 依存関係とスクリプト
+- [components.json](mdc:components.json): shadcn/ui設定
 - [tsconfig.json](mdc:tsconfig.json): TypeScript設定
+- [tsconfig.app.json](mdc:tsconfig.app.json): アプリケーション用TypeScript設定
 - [eslint.config.js](mdc:eslint.config.js): ESLint設定
-- [src/main/App.tsx](mdc:src/main/App.tsx): メインアプリケーションコンポーネント
+- [src/App.tsx](mdc:src/App.tsx): メインアプリケーションコンポーネント
+- [src/main.tsx](mdc:src/main.tsx): アプリケーションエントリーポイント
+- [src/index.css](mdc:src/index.css): グローバルスタイル（Tailwind CSS含む）
+
+## shadcn/ui 統合
+
+- **スタイル**: New York スタイル
+- **ベースカラー**: Neutral
+- **CSS変数**: 有効
+- **アイコン**: Lucide React
+- **エイリアス設定**: 
+  - `@/components` → `src/components`
+  - `@/lib` → `src/lib`
+  - `@/components/ui` → `src/components/ui`

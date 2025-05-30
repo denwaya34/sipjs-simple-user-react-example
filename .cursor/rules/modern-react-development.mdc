@@ -1,0 +1,301 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# モダンReact開発ガイドライン
+
+このプロジェクトでのモダンなReact開発のベストプラクティスとガイドラインです。
+
+## React 19.1.0 の新機能と最適化
+
+### React Compiler の活用
+- React 19では自動最適化が改善されています
+- `useMemo`や`useCallback`の過度な使用を避ける
+- コンポーネントの自然な再レンダリングを信頼する
+
+### 新しいフック
+- `use()`: Promise やContext の読み取り
+- `useOptimistic()`: 楽観的更新
+- `useActionState()`: フォーム状態管理
+
+## TypeScript 5.8.3 ベストプラクティス
+
+### 厳密な型チェック
+```typescript
+// tsconfig.json の設定を活用
+interface Props {
+  children: React.ReactNode;
+  className?: string;
+}
+
+// 型安全なイベントハンドラー
+const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  // 実装
+};
+```
+
+### 型推論の活用
+```typescript
+// 明示的な型注釈よりも推論を優先
+const [state, setState] = useState(initialValue); // 型推論
+const data = await fetchData(); // 戻り値の型推論
+```
+
+## コンポーネント設計パターン
+
+### 関数コンポーネントのみ使用
+```typescript
+// ✅ 推奨: 関数コンポーネント
+export function UserProfile({ user }: { user: User }) {
+  return <div>{user.name}</div>;
+}
+
+// ❌ 非推奨: クラスコンポーネント
+```
+
+### Props インターフェース
+```typescript
+interface ButtonProps {
+  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+export function Button({ variant = 'primary', ...props }: ButtonProps) {
+  // 実装
+}
+```
+
+## Tailwind CSS 4.1.8 + daisyUI 5.0.43
+
+### ユーティリティファーストアプローチ
+```tsx
+// ✅ 推奨: Tailwind + daisyUI クラス
+<button className="btn btn-primary btn-lg">
+  Click me
+</button>
+
+// ✅ レスポンシブデザイン
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {/* コンテンツ */}
+</div>
+```
+
+### daisyUI コンポーネント活用
+```tsx
+// daisyUIのコンポーネントクラスを活用
+<div className="card bg-base-100 shadow-xl">
+  <div className="card-body">
+    <h2 className="card-title">Card Title</h2>
+    <p>Card content</p>
+    <div className="card-actions justify-end">
+      <button className="btn btn-primary">Action</button>
+    </div>
+  </div>
+</div>
+```
+
+## shadcn/ui 統合
+
+### コンポーネント追加
+```bash
+# 新しいコンポーネントの追加
+npx shadcn@latest add button
+npx shadcn@latest add input
+npx shadcn@latest add dialog
+```
+
+### カスタマイズ
+```typescript
+// src/components/ui/button.tsx をベースにカスタマイズ
+import { cn } from "@/lib/utils";
+
+interface CustomButtonProps extends ButtonProps {
+  loading?: boolean;
+}
+
+export function CustomButton({ loading, children, ...props }: CustomButtonProps) {
+  return (
+    <Button {...props} disabled={loading || props.disabled}>
+      {loading && <Spinner className="mr-2" />}
+      {children}
+    </Button>
+  );
+}
+```
+
+## SIP.js 統合パターン
+
+### カスタムフック設計
+```typescript
+// src/hooks/useSipConnection.ts
+export function useSipConnection() {
+  const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // SIP.js ロジック
+  
+  return {
+    isConnected,
+    error,
+    connect,
+    disconnect,
+  };
+}
+```
+
+### エラーハンドリング
+```typescript
+// SIP関連エラーの型安全な処理
+interface SipError {
+  code: number;
+  message: string;
+  cause?: string;
+}
+
+const handleSipError = (error: SipError) => {
+  // エラー処理ロジック
+};
+```
+
+## パフォーマンス最適化
+
+### 遅延読み込み
+```typescript
+// ページレベルでの遅延読み込み
+const CallPage = lazy(() => import('./pages/CallPage'));
+
+// コンポーネントでの条件付き読み込み
+const HeavyComponent = lazy(() => import('./HeavyComponent'));
+```
+
+### メモ化の適切な使用
+```typescript
+// React 19では過度なメモ化は不要
+// 本当に必要な場合のみ使用
+const ExpensiveComponent = memo(({ data }: { data: ComplexData }) => {
+  // 重い計算処理
+  return <div>{/* レンダリング */}</div>;
+});
+```
+
+## 状態管理
+
+### ローカル状態優先
+```typescript
+// useState for local component state
+const [isOpen, setIsOpen] = useState(false);
+
+// useReducer for complex state logic
+const [state, dispatch] = useReducer(reducer, initialState);
+```
+
+### Context の適切な使用
+```typescript
+// テーマやユーザー情報など、グローバルな状態のみ
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within ThemeProvider');
+  }
+  return context;
+}
+```
+
+## テスト戦略
+
+### コンポーネントテスト
+```typescript
+// React Testing Library を使用
+import { render, screen, fireEvent } from '@testing-library/react';
+
+test('button handles click events', () => {
+  const handleClick = jest.fn();
+  render(<Button onClick={handleClick}>Click me</Button>);
+  
+  fireEvent.click(screen.getByRole('button'));
+  expect(handleClick).toHaveBeenCalledTimes(1);
+});
+```
+
+### SIP.js モック
+```typescript
+// SIP.js のモック化
+jest.mock('sip.js', () => ({
+  UserAgent: jest.fn().mockImplementation(() => ({
+    start: jest.fn(),
+    stop: jest.fn(),
+    // その他のメソッド
+  })),
+}));
+```
+
+## 開発ツール設定
+
+### ESLint 設定活用
+- [eslint.config.js](mdc:eslint.config.js) の厳密なルールに従う
+- React Hooks のルールを遵守
+- TypeScript の型チェックを活用
+
+### Vite 最適化
+- [vite.config.ts](mdc:vite.config.ts) のHMR設定を活用
+- 開発時のパフォーマンス最適化
+- ビルド時の最適化設定
+
+## アクセシビリティ
+
+### ARIA 属性
+```tsx
+<button
+  aria-label="Close dialog"
+  aria-expanded={isOpen}
+  onClick={handleClose}
+>
+  <CloseIcon />
+</button>
+```
+
+### キーボードナビゲーション
+```tsx
+const handleKeyDown = (event: React.KeyboardEvent) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    handleClick();
+  }
+};
+```
+
+## ファイル構成ベストプラクティス
+
+### インポート順序
+```typescript
+// 1. React関連
+import React, { useState, useEffect } from 'react';
+
+// 2. 外部ライブラリ
+import { UserAgent } from 'sip.js';
+import { cn } from '@/lib/utils';
+
+// 3. 内部コンポーネント
+import { Button } from '@/components/ui/button';
+import { useTheme } from '@/hooks/useTheme';
+
+// 4. 型定義
+import type { User, CallState } from '@/types';
+```
+
+### エクスポート
+```typescript
+// 名前付きエクスポートを優先
+export { Button } from './Button';
+export { Input } from './Input';
+
+// デフォルトエクスポートは最小限に
+export default function App() {
+  // 実装
+}
+```

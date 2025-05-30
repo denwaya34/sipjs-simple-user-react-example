@@ -1,0 +1,390 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Vite 6.3.5 ビルド最適化ガイド
+
+このプロジェクトでのVite設定とビルド最適化のベストプラクティスです。
+
+## Vite 設定概要
+
+### 主要設定ファイル
+- [vite.config.ts](mdc:vite.config.ts): メインのVite設定
+- [tsconfig.app.json](mdc:tsconfig.app.json): アプリケーション用TypeScript設定
+- [tsconfig.node.json](mdc:tsconfig.node.json): Node.js用TypeScript設定
+
+### 現在の設定
+```typescript
+// vite.config.ts の基本構成
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import checker from 'vite-plugin-checker'
+import tsconfigPaths from 'vite-tsconfig-paths'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(),
+    checker({ typescript: true }),
+    tsconfigPaths(),
+  ],
+  // その他の設定
+})
+```
+
+## プラグイン活用
+
+### @vitejs/plugin-react
+- React Fast Refresh対応
+- JSX変換の最適化
+- 開発時のHMR（Hot Module Replacement）
+
+### @tailwindcss/vite
+- Tailwind CSS 4.1.8の統合
+- JIT（Just-In-Time）コンパイル
+- 未使用CSSの自動削除
+
+### vite-plugin-checker
+- TypeScript型チェック
+- ESLintチェック
+- 開発時のリアルタイムエラー表示
+
+### vite-tsconfig-paths
+- TypeScriptパスマッピング対応
+- `@/` エイリアスの解決
+- [components.json](mdc:components.json) のエイリアス設定と連携
+
+## 開発環境最適化
+
+### HMR設定
+```typescript
+// 高速なHMRのための設定
+export default defineConfig({
+  server: {
+    hmr: {
+      overlay: true, // エラーオーバーレイ表示
+    },
+    open: true, // 自動ブラウザ起動
+  },
+})
+```
+
+### 依存関係の事前バンドル
+```typescript
+// 大きな依存関係の最適化
+export default defineConfig({
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'sip.js',
+      'lucide-react',
+    ],
+    exclude: [
+      // 開発時に除外するパッケージ
+    ],
+  },
+})
+```
+
+## ビルド最適化
+
+### チャンク分割戦略
+```typescript
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // ベンダーライブラリの分離
+          vendor: ['react', 'react-dom'],
+          sip: ['sip.js'],
+          ui: ['lucide-react', '@radix-ui/react-slot'],
+        },
+      },
+    },
+  },
+})
+```
+
+### アセット最適化
+```typescript
+export default defineConfig({
+  build: {
+    // アセットサイズ制限
+    chunkSizeWarningLimit: 1000,
+    
+    // ソースマップ生成（本番では無効化）
+    sourcemap: process.env.NODE_ENV === 'development',
+    
+    // 最小化設定
+    minify: 'esbuild',
+    
+    // アセットインライン閾値
+    assetsInlineLimit: 4096,
+  },
+})
+```
+
+## TypeScript統合
+
+### パス解決設定
+```json
+// tsconfig.app.json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/types/*": ["./src/types/*"]
+    }
+  }
+}
+```
+
+### 型チェック最適化
+```typescript
+// 開発時の型チェック設定
+export default defineConfig({
+  plugins: [
+    checker({
+      typescript: {
+        tsconfigPath: 'tsconfig.app.json',
+        buildMode: false, // 開発時は型チェックのみ
+      },
+      eslint: {
+        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+      },
+    }),
+  ],
+})
+```
+
+## CSS最適化
+
+### Tailwind CSS統合
+```typescript
+// Tailwind CSS 4.x の設定
+export default defineConfig({
+  css: {
+    postcss: {
+      plugins: [
+        // Tailwind CSS 4.x では自動設定
+      ],
+    },
+  },
+})
+```
+
+### CSS分割とキャッシュ
+```typescript
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.')
+          const extType = info[info.length - 1]
+          
+          if (/\.(css)$/.test(assetInfo.name)) {
+            return `css/[name]-[hash][extname]`
+          }
+          
+          return `assets/[name]-[hash][extname]`
+        },
+      },
+    },
+  },
+})
+```
+
+## 環境変数管理
+
+### 開発環境設定
+```typescript
+// .env.development
+VITE_API_URL=http://localhost:3000
+VITE_SIP_SERVER=ws://localhost:8080
+VITE_DEBUG=true
+```
+
+### 本番環境設定
+```typescript
+// .env.production
+VITE_API_URL=https://api.example.com
+VITE_SIP_SERVER=wss://sip.example.com
+VITE_DEBUG=false
+```
+
+### 型安全な環境変数
+```typescript
+// src/types/env.d.ts
+interface ImportMetaEnv {
+  readonly VITE_API_URL: string
+  readonly VITE_SIP_SERVER: string
+  readonly VITE_DEBUG: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}
+```
+
+## パフォーマンス監視
+
+### バンドルサイズ分析
+```bash
+# バンドルサイズ分析
+pnpm build
+npx vite-bundle-analyzer dist
+```
+
+### ビルド時間最適化
+```typescript
+export default defineConfig({
+  esbuild: {
+    // 開発時の最適化
+    target: 'es2020',
+    format: 'esm',
+  },
+  
+  build: {
+    // 本番ビルドの最適化
+    target: 'es2020',
+    modulePreload: {
+      polyfill: false, // モダンブラウザのみ対応
+    },
+  },
+})
+```
+
+## SIP.js 特有の設定
+
+### WebRTC対応
+```typescript
+export default defineConfig({
+  server: {
+    // HTTPS開発サーバー（WebRTC用）
+    https: process.env.HTTPS === 'true',
+  },
+  
+  define: {
+    // SIP.js用のグローバル定義
+    global: 'globalThis',
+  },
+})
+```
+
+### WebSocket プロキシ
+```typescript
+export default defineConfig({
+  server: {
+    proxy: {
+      '/ws': {
+        target: 'ws://localhost:8080',
+        ws: true,
+        changeOrigin: true,
+      },
+    },
+  },
+})
+```
+
+## デプロイメント最適化
+
+### 静的アセット最適化
+```typescript
+export default defineConfig({
+  build: {
+    // 静的アセットの最適化
+    assetsDir: 'assets',
+    
+    rollupOptions: {
+      output: {
+        // ファイル名のハッシュ化
+        entryFileNames: 'js/[name]-[hash].js',
+        chunkFileNames: 'js/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+      },
+    },
+  },
+})
+```
+
+### PWA対応準備
+```typescript
+// PWA用の設定（必要に応じて）
+export default defineConfig({
+  plugins: [
+    // PWAプラグインの追加
+    // VitePWA({
+    //   registerType: 'autoUpdate',
+    //   workbox: {
+    //     globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+    //   }
+    // })
+  ],
+})
+```
+
+## トラブルシューティング
+
+### よくある問題と解決策
+
+#### 1. HMRが動作しない
+```typescript
+// vite.config.ts
+export default defineConfig({
+  server: {
+    watch: {
+      usePolling: true, // WSL環境での対応
+    },
+  },
+})
+```
+
+#### 2. TypeScriptパスが解決されない
+```bash
+# vite-tsconfig-pathsプラグインの確認
+pnpm add -D vite-tsconfig-paths
+```
+
+#### 3. Tailwind CSSが適用されない
+```css
+/* src/index.css */
+@import "tailwindcss";
+@plugin "daisyui";
+```
+
+#### 4. SIP.js WebSocketエラー
+```typescript
+// WebSocket接続の設定確認
+const sipConfig = {
+  uri: import.meta.env.VITE_SIP_URI,
+  transportOptions: {
+    wsServers: [import.meta.env.VITE_SIP_SERVER],
+  },
+}
+```
+
+## 開発ワークフロー
+
+### 推奨コマンド
+```bash
+# 開発サーバー起動
+pnpm dev
+
+# 型チェック
+pnpm build
+
+# リント実行
+pnpm lint
+
+# プレビュー
+pnpm preview
+```
+
