@@ -1,54 +1,47 @@
-# React + TypeScript + Vite
+# SIP.jsを用いたSIPクライアントの実装
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Cursor 作成プロンプト
 
-Currently, two official plugins are available:
+```markdown
+SIP.jsのSimpleUserクラスを用いて、下記の仕様に基づいて実装してください。
+遠慮せずに、全力を尽くしてください。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- UI
+  下記のUIを配置してください。
+  - SIP WebSocket URL テキストボックス
+    SIP WebSocketサーバーのURLを入力するテキストボックス
+  - SIP User テキストボックス
+    SIPのユーザー名を入力するテキストボックス
+  - SIP Password テキストボックス
+    SIPのパスワードを入力するテキストボックス
+  - 接続ボタン
+    SimpleUserのconnectメソッドを呼び出すボタン
+    `SIP WebSocket URL テキストボックス`,`SIP User テキストボックス`,`SIP Password テキストボックス`が一文字以上入力されている場合のみ押下できる
+  - 発信番号テキストボックス
+    発信先の電話番号を入力するテキストボックス
+  - 発信ボタン
+    発信ボタンを押下すると、SimpleUserのcallメソッドを呼び出すボタン
+    待機中の場合のみ押下できる
+  - 切断ボタン
+    切断ボタンを押下すると、SimpleUserのhangupメソッドを呼び出すボタン
+    通話中の場合のみ押下できる
+  - 応答ボタン
+    着信があった場合に、SimpleUserのanswerメソッドを呼び出すボタン
+    着信中の場合のみ押下できる
+    通話中、待機中の場合は押下できない
+- SIP.jsのSimpleUserクラスを用いて、下記の機能を実装してください。
+  - SIP WebSocketサーバーへの接続
+    `SIP WebSocket URL テキストボックス`に入力されたURLに接続する
+  - 発信
+    `発信番号テキストボックス`に入力された電話番号に発信する
+  - 着信応答
+    着信中に応答ボタンを押下した場合、応答する
+  - 切断
+    通話中の場合に、切断する
+  - 状態表示
+    現在の状態を表示する（待機中、通話中、着信中、発信中のいづれかを表示）
+- 必要に応じてreactのカスタムフックでロジック部分を分離してください
+- メソッドは参照透過となる事を意識して実装してください
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
 ```
