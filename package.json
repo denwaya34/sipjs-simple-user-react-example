@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "1.2.3",
+    "@t3-oss/env-core": "0.13.6",
     "@tailwindcss/vite": "4.1.8",
     "@total-typescript/ts-reset": "0.6.1",
     "class-variance-authority": "0.7.1",
@@ -21,7 +22,8 @@
     "react-dom": "19.1.0",
     "sip.js": "0.21.2",
     "tailwind-merge": "3.3.0",
-    "tailwindcss": "4.1.8"
+    "tailwindcss": "4.1.8",
+    "zod": "3.25.42"
   },
   "devDependencies": {
     "@eslint/js": "9.25.0",
