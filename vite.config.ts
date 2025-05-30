@@ -16,7 +16,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        index: resolve(root, 'index.html'),
+        index: resolve(root, 'index', 'index.html'),
       },
     },
   },
@@ -31,7 +31,7 @@ export default defineConfig({
       typescript: true,
       eslint: {
         useFlatConfig: true,
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+        lintCommand: 'eslint "./**/*.{ts,tsx}"',
       },
     }),
   ],
