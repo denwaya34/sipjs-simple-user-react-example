@@ -1,4 +1,4 @@
-# SIP.jsを用いたSIPクライアントの実装
+# SIP.js SimpleUser SIP Client Example
 
 ## ソースコード
 - [Githubリポジトリ: denwaya34/sipjs-simple-user-react-example](https://github.com/denwaya34/sipjs-simple-user-react-example)
@@ -6,8 +6,9 @@
 ## Demo
 - [Github Pages](https://denwaya34.github.io/sipjs-simple-user-react-example/)
 
-## 
+## Copy
 
+下記コマンドでリポジトリを複製できます。
 ```shell
 npx degit denwaya34/sipjs-simple-user-react-example my-sipjs-example
 ```
