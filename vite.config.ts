@@ -6,15 +6,17 @@ import checker from 'vite-plugin-checker';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 const __dirname = import.meta.dirname;
+const outDir = resolve(__dirname, 'dist');
+const root = resolve(__dirname, 'src');
 
-// https://vite.dev/config/
 export default defineConfig({
+  root: root,
   build: {
+    outDir: outDir,
     sourcemap: true,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        login: resolve(__dirname, 'login.html'),
+        index: resolve(root, 'index.html'),
       },
     },
   },
