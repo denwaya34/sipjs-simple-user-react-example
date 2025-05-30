@@ -151,6 +151,7 @@ function App() {
               {connectionState === 'disconnected'
                 ? (
                     <button
+                      type="button"
                       className="btn btn-primary"
                       onClick={handleConnect}
                       disabled={!canConnect}
@@ -160,6 +161,7 @@ function App() {
                   )
                 : (
                     <button
+                      type="button"
                       className="btn btn-error"
                       onClick={handleDisconnect}
                       disabled={!canDisconnect}
@@ -200,6 +202,7 @@ function App() {
             {/* アクションボタン */}
             <div className="flex gap-2 justify-center">
               <button
+                type="button"
                 className="btn btn-success"
                 onClick={handleCall}
                 disabled={!canCall}
@@ -209,6 +212,7 @@ function App() {
               </button>
 
               <button
+                type="button"
                 className="btn btn-primary"
                 onClick={handleAnswer}
                 disabled={!canAnswer}
@@ -218,6 +222,7 @@ function App() {
               </button>
 
               <button
+                type="button"
                 className="btn btn-error"
                 onClick={handleHangup}
                 disabled={!canHangup}
