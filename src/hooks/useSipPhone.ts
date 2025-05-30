@@ -1,7 +1,7 @@
 import type { SimpleUser } from 'sip.js/lib/platform/web';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Web } from 'sip.js';
+import { URI, Web } from 'sip.js';
 
 import type { CallState, ConnectionState, SipConfig } from '../types/sip';
 
@@ -31,10 +31,10 @@ export const useSipPhone = () => {
 
       // SimpleUserのオプションを設定
       const options: Web.SimpleUserOptions = {
-        aor: config.aor,
         // 認証情報を設定
         userAgentOptions: {
-          authorizationUsername: config.aor.split('@')[0], // SIPユーザー名を抽出
+          uri: new URI('sip', config.user, new URL(config.server).host),
+          authorizationUsername: config.user, // SIPユーザー名を抽出
           authorizationPassword: config.password,
         },
         media: {
