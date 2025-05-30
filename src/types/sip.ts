@@ -7,7 +7,6 @@ export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'err
 // SIP設定の型
 export interface SipConfig {
   server: string;
-  aor: string;
   user: string;
   password: string;
 }
