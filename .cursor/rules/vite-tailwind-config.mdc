@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 # Vite + Tailwind CSS + daisyUI 設定ガイド
 
