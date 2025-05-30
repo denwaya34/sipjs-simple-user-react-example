@@ -1,6 +1,15 @@
 # SIP.jsを用いたSIPクライアントの実装
 
-# Cursor(Claude-4-sonnet opus: MAX Mode) 作成プロンプト
+- [Githubリポジトリ: sipjs-simple-user-react-example](https://denwaya34.github.io/sipjs-simple-user-react-example/)
+
+## Demo
+- [Github Pages](https://denwaya34.github.io/sipjs-simple-user-react-example/)
+
+## 作成プロンプト
+
+本コードのベースとなるコードを生成する時に使用したプロンプト.
+
+### Cursor(Claude-4-sonnet opus: MAX Mode) 作成プロンプト
 
 ```markdown
 SIP.jsのSimpleUserクラスを用いて、下記の仕様に基づいて実装してください。
