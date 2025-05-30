@@ -6,6 +6,14 @@
 ## Demo
 - [Github Pages](https://denwaya34.github.io/sipjs-simple-user-react-example/)
 
+**[注意事項]**
+使用を開始する前に一度`SIP WebSocket URL`に指定のホスト名にブラウザでhttpsでアクセスしてください。  
+※例)https://{AsteriskのIPアドレス}:8089  
+
+アクセスしてプライバシーエラーの表示が出た場合、詳細設定にある`アクセスする(安全ではありません)`ボタンを押下してください。  
+その後、Not Found表示のエラーが出れば問題ありません。  
+※これは自己証明書エラーの回避手順です。  
+
 ## Copy
 
 下記コマンドでリポジトリを複製できます。
