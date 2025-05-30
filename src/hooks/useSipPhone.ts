@@ -1,6 +1,6 @@
 import type { SimpleUser } from 'sip.js/lib/platform/web';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { URI, Web } from 'sip.js';
 
 import type { CallState, ConnectionState, SipConfig } from '../types/sip';
@@ -149,15 +149,6 @@ export const useSipPhone = () => {
       setError(err instanceof Error ? err.message : '切断エラーが発生しました');
       console.error('Hangup error:', err);
     }
-  }, []);
-
-  // クリーンアップ
-  useEffect(() => {
-    return () => {
-      if (simpleUserRef.current) {
-        simpleUserRef.current.disconnect().catch(console.error);
-      }
-    };
   }, []);
 
   return {
