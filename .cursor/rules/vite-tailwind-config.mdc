@@ -1,0 +1,316 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Vite + Tailwind CSS + daisyUI 設定ガイド
+
+このプロジェクトの Vite、Tailwind CSS、daisyUI の設定と使用方法について説明します。
+
+## Vite 設定
+
+### 基本設定
+[vite.config.ts](mdc:vite.config.ts) では以下の設定を行っています：
+
+```typescript
+export default defineConfig({
+  root: resolve(__dirname, 'src'),
+  base: '/sipjs-simple-user-react-example/',
+  build: {
+    outDir: resolve(__dirname, 'dist'),
+    sourcemap: true,
+  },
+  plugins: [
+    react(),
+    tailwindcss(),
+    tsconfigPaths(),
+    checker({
+      typescript: true,
+      eslint: { useFlatConfig: true }
+    })
+  ]
+});
+```
+
+### 重要なプラグイン
+
+#### 1. @vitejs/plugin-react
+- React Fast Refresh サポート
+- JSX トランスフォーム
+- 開発時のホットリロード
+
+#### 2. @tailwindcss/vite
+- Tailwind CSS 4.x サポート
+- 自動的なCSS処理
+- PostCSS設定不要
+
+#### 3. vite-tsconfig-paths
+- TypeScript パスマッピング
+- 絶対パスインポート
+- エイリアス解決
+
+#### 4. vite-plugin-checker
+- TypeScript型チェック
+- ESLint チェック
+- 開発時のリアルタイム検証
+
+## Tailwind CSS 4.x 設定
+
+### 新しい設定方式
+Tailwind CSS 4.x では `tailwind.config.js` は不要です。CSS ファイルで直接設定します：
+
+```css
+/* src/main/index.css */
+@import "tailwindcss";
+@plugin "daisyui";
+```
+
+### 主要な変更点
+1. **設定ファイル不要**: CSS内で `@import` と `@plugin` を使用
+2. **自動検出**: クラス名の自動検出とパージ
+3. **高速ビルド**: 最適化されたビルドプロセス
+
+## daisyUI 5.x 統合
+
+### インストールと設定
+```bash
+pnpm add -D daisyui@latest
+```
+
+### CSS設定
+```css
+/* src/main/index.css */
+@import "tailwindcss";
+@plugin "daisyui";
+```
+
+### テーマ設定（オプション）
+```css
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+  logs: false;
+}
+```
+
+## 開発環境設定
+
+### 1. 開発サーバー
+```bash
+pnpm dev
+```
+- ホットリロード有効
+- 自動ブラウザ起動
+- TypeScript/ESLint チェック
+
+### 2. ビルド
+```bash
+pnpm build
+```
+- TypeScript コンパイル
+- Vite バンドル
+- ソースマップ生成
+
+### 3. プレビュー
+```bash
+pnpm preview
+```
+- 本番ビルドのプレビュー
+- 静的ファイル配信
+
+## CSS アーキテクチャ
+
+### 1. グローバルスタイル
+```css
+/* src/main/index.css */
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* カスタムグローバルスタイル */
+body {
+  font-family: 'Inter', sans-serif;
+}
+```
+
+### 2. コンポーネントスタイル
+```typescript
+// Tailwind クラスを使用
+const Button = ({ children, variant = 'primary' }) => (
+  <button className={`btn btn-${variant}`}>
+    {children}
+  </button>
+);
+```
+
+### 3. 条件付きスタイル
+```typescript
+import { clsx } from 'clsx';
+
+const Alert = ({ type, children }) => (
+  <div className={clsx(
+    'alert',
+    {
+      'alert-success': type === 'success',
+      'alert-error': type === 'error',
+      'alert-warning': type === 'warning',
+    }
+  )}>
+    {children}
+  </div>
+);
+```
+
+## レスポンシブデザイン
+
+### 1. Tailwind ブレークポイント
+```typescript
+const Card = () => (
+  <div className="
+    w-full 
+    sm:w-1/2 
+    md:w-1/3 
+    lg:w-1/4 
+    xl:w-1/5
+  ">
+    {/* カード内容 */}
+  </div>
+);
+```
+
+### 2. daisyUI レスポンシブ
+```typescript
+const Navigation = () => (
+  <div className="
+    drawer 
+    lg:drawer-open
+  ">
+    <div className="drawer-content">
+      {/* メインコンテンツ */}
+    </div>
+    <div className="drawer-side">
+      {/* サイドバー */}
+    </div>
+  </div>
+);
+```
+
+## パフォーマンス最適化
+
+### 1. CSS パージ
+Tailwind CSS 4.x は自動的に未使用のCSSを削除します：
+- 使用されているクラスのみをバンドル
+- 動的クラス名の検出
+- 最小限のCSSサイズ
+
+### 2. コード分割
+```typescript
+// 遅延読み込み
+const LazyComponent = React.lazy(() => import('./LazyComponent'));
+
+// 条件付き読み込み
+const ConditionalStyles = React.lazy(() => 
+  import('./ConditionalStyles')
+);
+```
+
+### 3. アセット最適化
+```typescript
+// vite.config.ts
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          sip: ['sip.js'],
+        }
+      }
+    }
+  }
+});
+```
+
+## デバッグとトラブルシューティング
+
+### 1. Tailwind クラスが適用されない
+- CSS インポート順序を確認
+- クラス名のタイポをチェック
+- ブラウザの開発者ツールでCSS確認
+
+### 2. daisyUI コンポーネントが表示されない
+- プラグイン設定を確認
+- テーマ設定をチェック
+- コンポーネントクラス名を確認
+
+### 3. Vite ビルドエラー
+- TypeScript エラーを確認
+- ESLint エラーを修正
+- 依存関係の更新
+
+## 本番環境設定
+
+### 1. 環境変数
+```typescript
+// vite-env.d.ts
+interface ImportMetaEnv {
+  readonly VITE_SIP_SERVER: string;
+  readonly VITE_API_URL: string;
+}
+```
+
+### 2. ビルド最適化
+```typescript
+// vite.config.ts
+export default defineConfig({
+  build: {
+    minify: 'terser',
+    sourcemap: false, // 本番では無効
+    rollupOptions: {
+      external: ['some-large-library']
+    }
+  }
+});
+```
+
+### 3. 静的アセット
+```typescript
+// 静的アセットの最適化
+import logo from '/assets/logo.svg';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  assetsInclude: ['**/*.svg', '**/*.png', '**/*.jpg']
+});
+```
+
+## 開発ツール統合
+
+### 1. VS Code 拡張機能
+- Tailwind CSS IntelliSense
+- PostCSS Language Support
+- Vite
+
+### 2. ESLint 設定
+```javascript
+// eslint.config.js
+export default [
+  {
+    rules: {
+      // Tailwind クラス順序
+      'tailwindcss/classnames-order': 'warn',
+      // 未使用クラスの警告
+      'tailwindcss/no-custom-classname': 'warn'
+    }
+  }
+];
+```
+
+### 3. TypeScript 設定
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "types": ["vite/client"],
+    "moduleResolution": "bundler"
+  }
+}
+```

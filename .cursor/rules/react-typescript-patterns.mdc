@@ -1,0 +1,394 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# React + TypeScript 開発パターン
+
+このプロジェクトで使用する React + TypeScript の開発パターンとベストプラクティスです。
+
+## コンポーネント設計パターン
+
+### 1. 関数コンポーネント（推奨）
+```typescript
+// src/main/components/UserProfile.tsx
+interface UserProfileProps {
+  userId: string;
+  onUserUpdate?: (user: User) => void;
+}
+
+export const UserProfile: React.FC<UserProfileProps> = ({ 
+  userId, 
+  onUserUpdate 
+}) => {
+  // コンポーネントロジック
+  return <div>{/* JSX */}</div>;
+};
+```
+
+### 2. Props型定義
+```typescript
+// 基本的なProps
+interface ButtonProps {
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  onClick?: () => void;
+}
+
+// HTMLAttributes継承
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+}
+```
+
+### 3. 条件付きProps
+```typescript
+// 排他的Props
+type ButtonProps = 
+  | { variant: 'link'; href: string; onClick?: never }
+  | { variant?: 'primary' | 'secondary'; href?: never; onClick: () => void };
+```
+
+## カスタムフックパターン
+
+### 1. 状態管理フック
+```typescript
+// src/main/hooks/useLocalStorage.ts
+export const useLocalStorage = <T>(
+  key: string,
+  initialValue: T
+): [T, (value: T) => void] => {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      return initialValue;
+    }
+  });
+
+  const setValue = useCallback((value: T) => {
+    try {
+      setStoredValue(value);
+      window.localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  }, [key]);
+
+  return [storedValue, setValue];
+};
+```
+
+### 2. 非同期データフック
+```typescript
+// src/main/hooks/useAsyncData.ts
+interface UseAsyncDataResult<T> {
+  data: T | null;
+  loading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+}
+
+export const useAsyncData = <T>(
+  fetchFn: () => Promise<T>,
+  deps: React.DependencyList = []
+): UseAsyncDataResult<T> => {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await fetchFn();
+      setData(result);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+    } finally {
+      setLoading(false);
+    }
+  }, deps);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+};
+```
+
+## 型定義パターン
+
+### 1. API レスポンス型
+```typescript
+// src/types/ApiTypes.ts
+export interface ApiResponse<T> {
+  data: T;
+  status: 'success' | 'error';
+  message?: string;
+}
+
+export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+```
+
+### 2. 状態管理型
+```typescript
+// src/types/StateTypes.ts
+export interface LoadingState {
+  isLoading: boolean;
+  error: string | null;
+}
+
+export interface FormState<T> extends LoadingState {
+  values: T;
+  errors: Partial<Record<keyof T, string>>;
+  touched: Partial<Record<keyof T, boolean>>;
+}
+```
+
+### 3. イベントハンドラー型
+```typescript
+// 一般的なイベントハンドラー
+type ClickHandler = (event: React.MouseEvent<HTMLButtonElement>) => void;
+type ChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => void;
+type SubmitHandler = (event: React.FormEvent<HTMLFormElement>) => void;
+
+// カスタムイベントハンドラー
+type UserSelectHandler = (user: User) => void;
+type CallActionHandler = (action: 'answer' | 'decline' | 'hangup') => void;
+```
+
+## Context パターン
+
+### 1. 型安全なContext
+```typescript
+// src/main/lib/ThemeContext.tsx
+interface ThemeContextType {
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export const useTheme = (): ThemeContextType => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};
+
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ 
+  children 
+}) => {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  
+  const toggleTheme = useCallback(() => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  }, []);
+
+  const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
+
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+```
+
+## エラーハンドリングパターン
+
+### 1. Error Boundary
+```typescript
+// src/main/components/ErrorBoundary.tsx
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class ErrorBoundary extends React.Component<
+  React.PropsWithChildren<{}>,
+  ErrorBoundaryState
+> {
+  constructor(props: React.PropsWithChildren<{}>) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback error={this.state.error} />;
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+### 2. 非同期エラーハンドリング
+```typescript
+// src/main/hooks/useErrorHandler.ts
+export const useErrorHandler = () => {
+  const [error, setError] = useState<Error | null>(null);
+
+  const handleError = useCallback((error: unknown) => {
+    const errorObj = error instanceof Error ? error : new Error(String(error));
+    setError(errorObj);
+    console.error('Error handled:', errorObj);
+  }, []);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
+  return { error, handleError, clearError };
+};
+```
+
+## パフォーマンス最適化パターン
+
+### 1. メモ化
+```typescript
+// 重い計算のメモ化
+const expensiveValue = useMemo(() => {
+  return heavyComputation(data);
+}, [data]);
+
+// コールバックのメモ化
+const handleClick = useCallback((id: string) => {
+  onItemClick(id);
+}, [onItemClick]);
+
+// コンポーネントのメモ化
+export const ExpensiveComponent = React.memo<Props>(({ data }) => {
+  return <div>{/* 重いレンダリング */}</div>;
+});
+```
+
+### 2. 遅延読み込み
+```typescript
+// コンポーネントの遅延読み込み
+const LazyComponent = React.lazy(() => import('./LazyComponent'));
+
+// 条件付き遅延読み込み
+const ConditionalComponent = React.lazy(() => 
+  condition 
+    ? import('./ComponentA') 
+    : import('./ComponentB')
+);
+```
+
+## フォームパターン
+
+### 1. 制御されたコンポーネント
+```typescript
+// src/main/components/ContactForm.tsx
+interface ContactFormData {
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export const ContactForm: React.FC = () => {
+  const [formData, setFormData] = useState<ContactFormData>({
+    name: '',
+    email: '',
+    phone: ''
+  });
+
+  const handleChange = useCallback((field: keyof ContactFormData) => 
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData(prev => ({
+        ...prev,
+        [field]: event.target.value
+      }));
+    }, []
+  );
+
+  const handleSubmit = useCallback((event: React.FormEvent) => {
+    event.preventDefault();
+    // フォーム送信処理
+  }, [formData]);
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={formData.name}
+        onChange={handleChange('name')}
+        placeholder="名前"
+      />
+      {/* その他のフィールド */}
+    </form>
+  );
+};
+```
+
+## テストパターン
+
+### 1. コンポーネントテスト
+```typescript
+// src/main/components/__tests__/Button.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Button } from '../Button';
+
+describe('Button', () => {
+  it('should render with correct text', () => {
+    render(<Button>Click me</Button>);
+    expect(screen.getByText('Click me')).toBeInTheDocument();
+  });
+
+  it('should call onClick when clicked', () => {
+    const handleClick = jest.fn();
+    render(<Button onClick={handleClick}>Click me</Button>);
+    
+    fireEvent.click(screen.getByText('Click me'));
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+});
+```
+
+### 2. フックテスト
+```typescript
+// src/main/hooks/__tests__/useLocalStorage.test.ts
+import { renderHook, act } from '@testing-library/react';
+import { useLocalStorage } from '../useLocalStorage';
+
+describe('useLocalStorage', () => {
+  it('should return initial value', () => {
+    const { result } = renderHook(() => useLocalStorage('test', 'initial'));
+    expect(result.current[0]).toBe('initial');
+  });
+
+  it('should update value', () => {
+    const { result } = renderHook(() => useLocalStorage('test', 'initial'));
+    
+    act(() => {
+      result.current[1]('updated');
+    });
+    
+    expect(result.current[0]).toBe('updated');
+  });
+});
+```

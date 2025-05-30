@@ -1,0 +1,90 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# SIP.js React プロジェクト構造ガイド
+
+このプロジェクトは SIP.js を使用した React アプリケーションです。以下の構造とベストプラクティスに従ってください。
+
+## プロジェクト構造
+
+```
+sipjs-simple-user-react-example/
+├── src/
+│   ├── main/                    # メインアプリケーションコード
+│   │   ├── components/          # Reactコンポーネント
+│   │   ├── hooks/              # カスタムReactフック
+│   │   ├── lib/                # ユーティリティとヘルパー関数
+│   │   ├── App.tsx             # メインアプリケーションコンポーネント
+│   │   ├── main.tsx            # アプリケーションエントリーポイント
+│   │   └── index.css           # グローバルスタイル
+│   ├── types/                  # TypeScript型定義
+│   └── index.html              # HTMLテンプレート
+├── public/                     # 静的アセット
+├── .cursor/rules/              # Cursor AIルール
+├── package.json               # プロジェクト設定と依存関係
+├── vite.config.ts             # Vite設定
+├── tsconfig.json              # TypeScript設定
+└── eslint.config.js           # ESLint設定
+```
+
+## 主要技術スタック
+
+- **React 19.1.0**: 最新のReactバージョン
+- **TypeScript 5.8.3**: 厳密な型チェック
+- **SIP.js 0.21.2**: SIPプロトコル実装
+- **Vite 6.3.5**: 高速ビルドツール
+- **Tailwind CSS 4.1.8**: ユーティリティファーストCSS
+- **daisyUI 5.0.43**: Tailwind CSSコンポーネントライブラリ
+
+## ファイル命名規則
+
+- **コンポーネント**: PascalCase (例: `UserProfile.tsx`)
+- **フック**: camelCase with "use" prefix (例: `useSipConnection.ts`)
+- **ユーティリティ**: camelCase (例: `sipUtils.ts`)
+- **型定義**: PascalCase with "Type" suffix (例: `UserType.ts`)
+
+## コンポーネント配置ルール
+
+### `/src/main/components/`
+- 再利用可能なUIコンポーネント
+- SIP関連のコンポーネント（通話UI、連絡先リストなど）
+- フォームコンポーネント
+
+### `/src/main/hooks/`
+- SIP.js関連のカスタムフック
+- 状態管理フック
+- API呼び出しフック
+
+### `/src/main/lib/`
+- SIP.js設定とユーティリティ
+- 共通ヘルパー関数
+- 定数定義
+
+### `/src/types/`
+- SIP関連の型定義
+- API レスポンス型
+- アプリケーション全体で使用される型
+
+## SIP.js 統合ガイドライン
+
+1. **SIP設定**: `/src/main/lib/sipConfig.ts` でSIP設定を管理
+2. **通話管理**: カスタムフックで通話状態を管理
+3. **エラーハンドリング**: SIP関連エラーの適切な処理
+4. **型安全性**: SIP.jsイベントとメソッドの型定義
+
+## 開発ワークフロー
+
+1. **開発サーバー**: `pnpm dev`
+2. **ビルド**: `pnpm build`
+3. **リント**: `pnpm lint`
+4. **プレビュー**: `pnpm preview`
+
+## 重要な設定ファイル
+
+- [vite.config.ts](mdc:vite.config.ts): Vite設定、プラグイン、ビルド設定
+- [package.json](mdc:package.json): 依存関係とスクリプト
+- [tsconfig.json](mdc:tsconfig.json): TypeScript設定
+- [eslint.config.js](mdc:eslint.config.js): ESLint設定
+- [src/main/App.tsx](mdc:src/main/App.tsx): メインアプリケーションコンポーネント

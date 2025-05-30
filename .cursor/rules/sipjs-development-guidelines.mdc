@@ -1,0 +1,177 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# SIP.js 開発ガイドライン
+
+SIP.js を使用した React アプリケーション開発のベストプラクティスとガイドラインです。
+
+## SIP.js 基本概念
+
+### UserAgent
+- SIP通信の中心となるクラス
+- 登録、通話発信、着信処理を管理
+- アプリケーション全体で1つのインスタンスを使用
+
+### Session
+- 個別の通話セッションを表現
+- 音声/ビデオ通話の状態管理
+- メディアストリームの制御
+
+### Registerer
+- SIPサーバーへの登録を管理
+- 認証情報の処理
+- 登録状態の監視
+
+## 推奨アーキテクチャパターン
+
+### 1. SIP Context Provider
+```typescript
+// src/main/lib/SipContext.tsx
+interface SipContextType {
+  userAgent: UserAgent | null;
+  isRegistered: boolean;
+  currentSession: Session | null;
+  // その他のSIP状態
+}
+```
+
+### 2. カスタムフック
+```typescript
+// src/main/hooks/useSipConnection.ts
+export const useSipConnection = () => {
+  // SIP接続ロジック
+  // 登録状態管理
+  // エラーハンドリング
+}
+
+// src/main/hooks/useSipCall.ts
+export const useSipCall = () => {
+  // 通話発信/応答
+  // 通話状態管理
+  // メディア制御
+}
+```
+
+### 3. SIP設定管理
+```typescript
+// src/main/lib/sipConfig.ts
+export interface SipConfig {
+  uri: string;
+  authorizationUsername: string;
+  authorizationPassword: string;
+  websocketServer: string;
+  // その他の設定
+}
+```
+
+## 型定義ガイドライン
+
+### SIP関連型定義
+```typescript
+// src/types/SipTypes.ts
+export interface CallState {
+  status: 'idle' | 'connecting' | 'connected' | 'disconnected';
+  duration: number;
+  remoteIdentity?: string;
+}
+
+export interface RegistrationState {
+  isRegistered: boolean;
+  registrationState: 'registered' | 'unregistered' | 'registering';
+  lastError?: string;
+}
+```
+
+## エラーハンドリング
+
+### 1. SIP エラーの分類
+- **接続エラー**: WebSocket接続失敗
+- **認証エラー**: 認証情報の問題
+- **通話エラー**: 通話確立/維持の問題
+- **メディアエラー**: 音声/ビデオの問題
+
+### 2. エラーハンドリングパターン
+```typescript
+try {
+  await userAgent.start();
+} catch (error) {
+  if (error instanceof SessionDescriptionHandlerError) {
+    // メディア関連エラー
+  } else if (error instanceof TransportError) {
+    // 接続エラー
+  }
+  // 適切なエラー処理
+}
+```
+
+## パフォーマンス最適化
+
+### 1. メモリ管理
+- UserAgentインスタンスの適切な破棄
+- Sessionオブジェクトのクリーンアップ
+- イベントリスナーの削除
+
+### 2. 状態管理
+- 不要な再レンダリングの防止
+- useMemo/useCallbackの適切な使用
+- 状態の正規化
+
+## セキュリティ考慮事項
+
+### 1. 認証情報の管理
+- 環境変数での設定管理
+- 認証情報の暗号化
+- セッション管理
+
+### 2. WebRTC セキュリティ
+- STUN/TURNサーバーの設定
+- メディアストリームの適切な処理
+- プライバシー保護
+
+## テスト戦略
+
+### 1. ユニットテスト
+- SIPユーティリティ関数のテスト
+- カスタムフックのテスト
+- 状態管理ロジックのテスト
+
+### 2. 統合テスト
+- SIP接続フローのテスト
+- 通話シナリオのテスト
+- エラーケースのテスト
+
+### 3. E2Eテスト
+- 実際のSIPサーバーとの通信テスト
+- ブラウザ間通話テスト
+- メディア品質テスト
+
+## デバッグとログ
+
+### 1. SIP.js ログ設定
+```typescript
+import { LogLevel } from 'sip.js';
+
+// 開発環境でのデバッグログ
+const logLevel = process.env.NODE_ENV === 'development' 
+  ? LogLevel.Debug 
+  : LogLevel.Error;
+```
+
+### 2. カスタムログ
+- SIP状態変更のログ
+- 通話品質メトリクス
+- エラー詳細の記録
+
+## 依存関係管理
+
+### 重要な依存関係
+- [sip.js](mdc:package.json): SIPプロトコル実装
+- [react](mdc:package.json): UIフレームワーク
+- [typescript](mdc:package.json): 型安全性
+
+### 開発依存関係
+- ESLint設定: React/TypeScript最適化
+- Vite設定: 高速開発環境
+- TypeScript設定: 厳密な型チェック
