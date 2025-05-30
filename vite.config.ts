@@ -12,6 +12,7 @@ const root = resolve(__dirname, 'src');
 
 export default defineConfig({
   root: root,
+  base: '/sipjs-simple-user-react-example/',
   build: {
     outDir: outDir,
     sourcemap: true,
