@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 # React + TypeScript 開発パターン
 
@@ -385,7 +385,7 @@ describe('useLocalStorage', () => {
     const { result } = renderHook(() => useLocalStorage('test', 'initial'));
     
     act(() => {
-      result.current[1]('updated');
+      result.current[1](mdc:'updated');
     });
     
     expect(result.current[0]).toBe('updated');
